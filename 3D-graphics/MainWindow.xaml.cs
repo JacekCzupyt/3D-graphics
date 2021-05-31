@@ -25,20 +25,12 @@ namespace _3D_graphics
         public MainWindow()
         {
             InitializeComponent();
+            InitializeLines();
         }
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            line = new Line();
-            line.Stroke = Brushes.LightSteelBlue;
-
-            line.X1 = 1;
-            line.X2 = 50;
-            line.Y1 = 1;
-            line.Y2 = 50;
-
-            line.StrokeThickness = 2;
-            MainDisplayCanvas.Children.Add(line);
+            DrawDisplay();
         }
     }
 }
