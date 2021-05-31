@@ -43,14 +43,14 @@ namespace _3D_graphics
         private Vector WorldToCamera(Vector wsv)
         {
             Vector v = (Vector)(ProjectionMatrix * wsv);
-            return (Vector)(v / v[3]);
+            return (Vector)(v / v[2]);
         }
 
         private Vector CameraToScreen(Vector ssv)
         {
             Matrix CameraToScreenMatrix = DenseMatrix.OfArray(new double[,]{
-                {MainDisplayCanvas.Width/2, 0, 0, MainDisplayCanvas.Width/2},
-                {-MainDisplayCanvas.Height/2 , 0, 0, MainDisplayCanvas.Height/2},
+                {MainDisplayCanvas.ActualWidth/2, 0, MainDisplayCanvas.ActualWidth/2, 0},
+                {0, -MainDisplayCanvas.ActualHeight/2 , MainDisplayCanvas.ActualHeight/2, 0},
                 {0, 0, 1, 0 },
                 {0, 0, 0, 1 }
             });
