@@ -11,10 +11,14 @@ namespace _3D_graphics
 {
     public partial class MainWindow : System.Windows.Window
     {
-        List<(Vector, Vector)> lines;
+        Cube cube = new Cube(
+            DenseVector.OfArray(new double[] { 1, 1, 1, 1 }),
+            DenseVector.OfArray(new double[] { 0, 0, 3, 1 }),
+            DenseVector.OfArray(new double[] { 0, 0, 0, 1 })
+            );
 
         double xFov = Math.PI / 2;
-        double yFov = Math.PI / 3;
+        double yFov = Math.PI / 2;
 
         Matrix ProjectionMatrix { get => DenseMatrix.OfArray(new double[,]
          {
@@ -32,12 +36,17 @@ namespace _3D_graphics
         private void DrawDisplay()
         {
             ClearCanvas();
-            foreach(var l in lines)
+            foreach(var l in cube.GetTransformedLines())
             {
-                var p1 = CameraToScreen(WorldToCamera(l.Item1));
-                var p2 = CameraToScreen(WorldToCamera(l.Item2));
-                DrawLine(p1, p2);
+                DisplayLine(l);
             }
+        }
+
+        public void DisplayLine((Vector, Vector) l)
+        {
+            var p1 = CameraToScreen(WorldToCamera(l.Item1));
+            var p2 = CameraToScreen(WorldToCamera(l.Item2));
+            DrawLine(p1, p2);
         }
 
         private Vector WorldToCamera(Vector wsv)
@@ -72,13 +81,9 @@ namespace _3D_graphics
         }
 
 
-        private void InitializeLines()
+        private void InitializeFov()
         {
-            lines = new List<(Vector, Vector)>()
-            {
-                (DenseVector.OfArray(new double[]{0, 1, 3, 1}), DenseVector.OfArray(new double[]{0, -1, 3, 1})),
-                (DenseVector.OfArray(new double[]{1, 0, 3, 1}), DenseVector.OfArray(new double[]{-1, 0, 3, 1})),
-            };
+            yFov = Math.Atan(Math.Tan(xFov) * MainDisplayCanvas.ActualHeight / MainDisplayCanvas.ActualWidth);
         }
 
     }

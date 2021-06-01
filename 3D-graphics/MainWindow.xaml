@@ -8,7 +8,8 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Canvas x:Name="MainDisplayCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                   Loaded="MainDisplayCanvas_Loaded"/>
+                   Loaded="MainDisplayCanvas_Loaded"
+                    SizeChanged="MainDisplayCanvas_SizeChanged"/>
 
     </Grid>
 </Window>
