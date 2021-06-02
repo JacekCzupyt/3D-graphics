@@ -49,7 +49,7 @@ namespace _3D_graphics
         {
             Ticks++;
             double time = 0.02 * Ticks;
-            cube.rot[1] = time * Math.PI / 2;
+            cube.rotation[1] = time * Math.PI / 2;
             DrawDisplay();
         }
 

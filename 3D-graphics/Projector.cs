@@ -12,9 +12,9 @@ namespace _3D_graphics
     public partial class MainWindow : System.Windows.Window
     {
         Box cube = new Box(
-            Vector<double>.Build.DenseOfArray(new double[] { 2, 1, 1, 1 }),
             Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 3, 1 }),
-            Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 })
+            Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 }),
+            Vector<double>.Build.DenseOfArray(new double[] { 2, 1, 1, 1 })
             );
 
         double xFov = Math.PI / 2;
@@ -36,7 +36,7 @@ namespace _3D_graphics
         private void DrawDisplay()
         {
             ClearCanvas();
-            foreach(var l in cube.GetTransformedLines())
+            foreach(var l in cube.GetLines())
             {
                 DisplayLine(l);
             }

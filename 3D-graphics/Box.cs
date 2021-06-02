@@ -7,65 +7,13 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace _3D_graphics
 {
-    class Box : _3DObject
+    class Box : AbstractWireframeObject
     {
-        public Box(Vector<double> d, Vector<double> p, Vector<double> r)
-        {
-            dim = d;
-            pos = p;
-            rot = r;
-        }
+        static Vector<double> box_scale = Vector<double>.Build.DenseOfArray(new double[] { 0.5f, 0.5f, 0.5f, 1 });
 
-        public Vector<double> dim, pos, rot;
-
-        static Vector<double> scale = Vector<double>.Build.DenseOfArray(new double[] { 0.5f, 0.5f, 0.5f, 1 });
-
-        public void Draw(Matrix<double> m)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<(Vector<double>, Vector<double>)> GetTransformedLines()
-        {
-            return GetPoints().Select(l => (
-                Transform(l.Item1.PointwiseMultiply(dim).PointwiseMultiply(scale)), 
-                Transform(l.Item2.PointwiseMultiply(dim).PointwiseMultiply(scale))
-            ));
-        }
-
-        private Vector<double> Transform(Vector<double> v)
-        {
-            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, 0 },
-                {0, Math.Cos(rot[0]), -Math.Sin(rot[0]), 0 },
-                {0, Math.Sin(rot[0]), Math.Cos(rot[0]), 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(rot[1]), 0, -Math.Sin(rot[1]), 0 },
-                {0, 1, 0, 0 },
-                {Math.Sin(rot[1]), 0, Math.Cos(rot[1]), 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(rot[2]), -Math.Sin(rot[2]), 0, 0 },
-                {Math.Sin(rot[2]), Math.Cos(rot[2]), 0, 0 },
-                {0, 0, 1, 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, pos[0]},
-                {0, 1, 0, pos[1]},
-                {0, 0, 1, pos[2]},
-                {0, 0, 0, 1 }
-            });
-
-            return (trans * xRot * yRot * zRot * v);
-
-        }
+        public Box(Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null) : 
+            base(position, rotation, scale)
+        { }
 
         private IEnumerable<(Vector<double>, Vector<double>)> GetPoints()
         {
@@ -88,13 +36,10 @@ namespace _3D_graphics
             };
             return list;
         }
-    }
 
-    public static class ConversionExtensions
-    {
-        public static Vector<double> ToVector(this MathNet.Numerics.LinearAlgebra.Vector<double> input)
+        protected override IEnumerable<(Vector<double>, Vector<double>)> GetRawLines()
         {
-            return (Vector<double>)input;
+            return GetPoints().Select(l => (l.Item1.PointwiseMultiply(box_scale), l.Item2.PointwiseMultiply(box_scale)));
         }
     }
 }
