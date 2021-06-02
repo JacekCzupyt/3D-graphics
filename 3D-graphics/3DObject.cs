@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace _3D_graphics
 {
     interface _3DObject
     {
-        void Draw(Matrix m);
+        void Draw(Matrix<double> m);
     }
 }
