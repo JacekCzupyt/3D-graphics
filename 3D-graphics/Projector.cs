@@ -18,12 +18,12 @@ namespace _3D_graphics
             );
 
         double xFov = Math.PI / 2;
-        double yFov = Math.PI / 2;
+        double yFov = Math.PI / 3;
 
         Matrix ProjectionMatrix { get => DenseMatrix.OfArray(new double[,]
          {
-            { Math.Tan(xFov/2), 0, 0, 0},
-            {0, Math.Tan(yFov/2), 0, 0 },
+            {1 / Math.Tan(xFov/2), 0, 0, 0},
+            {0, 1 / Math.Tan(yFov/2), 0, 0 },
             {0, 0, 1, 0 },
             {0, 0, 0, 1 }
          }); }
@@ -83,7 +83,7 @@ namespace _3D_graphics
 
         private void InitializeFov()
         {
-            yFov = Math.Atan(Math.Tan(xFov) * MainDisplayCanvas.ActualHeight / MainDisplayCanvas.ActualWidth);
+            yFov = Math.Atan(Math.Tan(xFov/2) * MainDisplayCanvas.ActualHeight / MainDisplayCanvas.ActualWidth)*2;
         }
 
     }
