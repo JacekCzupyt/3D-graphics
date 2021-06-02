@@ -7,9 +7,9 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace _3D_graphics
 {
-    class Cube : _3DObject
+    class Box : _3DObject
     {
-        public Cube(Vector<double> d, Vector<double> p, Vector<double> r)
+        public Box(Vector<double> d, Vector<double> p, Vector<double> r)
         {
             dim = d;
             pos = p;
