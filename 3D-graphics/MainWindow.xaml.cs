@@ -21,7 +21,6 @@ namespace _3D_graphics
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Line line;
         private DispatcherTimer dispatcherTimer;
         int Ticks = 0;
 
@@ -49,7 +48,7 @@ namespace _3D_graphics
         {
             Ticks++;
             double time = 0.02 * Ticks;
-            cube.rotation[1] = time * Math.PI / 2;
+            cube.Rotation[1] = time * Math.PI / 2;
             DrawDisplay();
         }
 

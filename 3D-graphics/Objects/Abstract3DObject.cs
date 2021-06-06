@@ -29,7 +29,7 @@ namespace _3D_graphics.Objects
             this.Rotation = rotation ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
         }
 
-        private (Matrix<double>, Matrix<double>, Matrix<double>, Matrix<double>) getMatricies()
+        protected Matrix<double> getTransformationMatrix()
         {
             Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
@@ -58,11 +58,18 @@ namespace _3D_graphics.Objects
                 {0, 0, 1, Position[2]},
                 {0, 0, 0, 1 }
             });
+            
+            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Scale[0], 0, 0, 0},
+                {0, Scale[1], 0, 0},
+                {0, 0, Scale[2], 0},
+                {0, 0, 0, Scale[3] }
+            });
 
-            return (xRot, yRot, zRot, trans);
+            return xRot * yRot * zRot * trans * scale;
         }
 
-        private (Matrix<double>, Matrix<double>, Matrix<double>, Matrix<double>) getInverseMatricies()
+        protected Matrix<double> getInverseMatrix()
         {
             Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
@@ -92,31 +99,14 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, 1 }
             });
 
-            return (xRot, yRot, zRot, trans);
-        }
+            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1/Scale[0], 0, 0, 0},
+                {0, 1/Scale[1], 0, 0},
+                {0, 0, 1/Scale[2], 0},
+                {0, 0, 0, 1/Scale[3] }
+            });
 
-        protected Vector<double> Transform(Vector<double> v)
-        {
-            var (xRot, yRot, zRot, trans) = getMatricies();
-            return trans * xRot * yRot * zRot * v.PointwiseMultiply(Scale);
-        }
-
-        protected IEnumerable<Vector<double>> Transform(IEnumerable<Vector<double>> v)
-        {
-            var (xRot, yRot, zRot, trans) = getMatricies();
-            return v.Select(u => trans * xRot * yRot * zRot * u.PointwiseMultiply(Scale));
-        }
-
-        protected Vector<double> InverseTransform(Vector<double> v)
-        {
-            var (xRot, yRot, zRot, trans) = getInverseMatricies();
-            return (zRot * yRot * xRot * trans * v).PointwiseDivide(Scale);
-        }
-
-        protected IEnumerable<Vector<double>> InverseTransform(IEnumerable<Vector<double>> v)
-        {
-            var (xRot, yRot, zRot, trans) = getInverseMatricies();
-            return v.Select(u => trans * xRot * yRot * zRot * u.PointwiseMultiply(Scale));
+            return scale * zRot * yRot * xRot * trans;
         }
     }
 }
