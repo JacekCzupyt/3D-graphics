@@ -69,7 +69,7 @@ namespace _3D_graphics
 
         private void DrawLine(Vector<double> v1, Vector<double> v2)
         {
-            line = new Line();
+            Line line = new Line();
             line.Stroke = System.Windows.Media.Brushes.Black;
 
             line.X1 = v1[0];
@@ -80,7 +80,6 @@ namespace _3D_graphics
             line.StrokeThickness = 4;
             MainDisplayCanvas.Children.Add(line);
         }
-
 
         private void InitializeFov()
         {
