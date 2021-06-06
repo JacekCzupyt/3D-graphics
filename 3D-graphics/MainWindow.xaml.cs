@@ -24,6 +24,7 @@ namespace _3D_graphics
     {
         private DispatcherTimer dispatcherTimer;
         int Ticks = 0;
+        const int deltaTime = 10;
 
         public MainWindow()
         {
@@ -39,15 +40,22 @@ namespace _3D_graphics
         private void InitializeTimer()
         {
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(NewFrame);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 20);
+            dispatcherTimer.Tick += new EventHandler(Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, deltaTime);
             dispatcherTimer.Start();
         }
 
-        private void NewFrame(object sender, EventArgs e)
+        private void Tick(object sender, EventArgs e)
         {
             Ticks++;
-            double time = 0.02 * Ticks;
+            double dt = deltaTime * 0.001d;
+            Movement(dt);
+            double time = Ticks * dt;
+            NewFrame(time);
+        }
+
+        private void NewFrame(double time)
+        {
             Scene.ForEach(o => o.Rotation[1] = time * Math.PI / 2);
             MainCamera.DrawScene(Scene);
         }

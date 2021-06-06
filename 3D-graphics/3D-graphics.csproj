@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="FirstPersonController.cs" />
     <Compile Include="Objects\Camera.cs" />
     <Compile Include="Objects\I3DObject.cs" />
     <Compile Include="Objects\IWireframe.cs" />
