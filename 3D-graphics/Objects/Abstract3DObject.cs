@@ -10,7 +10,13 @@ namespace _3D_graphics.Objects
     abstract class Abstract3DObject
     {
 
-        public Vector<double> scale, position, rotation;
+        private Vector<double> rotation;
+        private Vector<double> scale;
+        private Vector<double> position;
+
+        public virtual Vector<double> Scale { get => scale; set => scale = value; }
+        public virtual Vector<double> Position { get => position; set => position = value; }
+        public virtual Vector<double> Rotation { get => rotation; set => rotation = value; }
 
         protected Abstract3DObject(
             Vector<double> position = null, 
@@ -18,75 +24,99 @@ namespace _3D_graphics.Objects
             Vector<double> scale = null
             )
         {
-            this.scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
-            this.position = position ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
-            this.rotation = rotation ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
+            this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
+            this.Position = position ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
+            this.Rotation = rotation ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
+        }
+
+        private (Matrix<double>, Matrix<double>, Matrix<double>, Matrix<double>) getMatricies()
+        {
+            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1, 0, 0, 0 },
+                {0, Math.Cos(Rotation[0]), -Math.Sin(Rotation[0]), 0 },
+                {0, Math.Sin(Rotation[0]), Math.Cos(Rotation[0]), 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(Rotation[1]), 0, -Math.Sin(Rotation[1]), 0 },
+                {0, 1, 0, 0 },
+                {Math.Sin(Rotation[1]), 0, Math.Cos(Rotation[1]), 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(Rotation[2]), -Math.Sin(Rotation[2]), 0, 0 },
+                {Math.Sin(Rotation[2]), Math.Cos(Rotation[2]), 0, 0 },
+                {0, 0, 1, 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1, 0, 0, Position[0]},
+                {0, 1, 0, Position[1]},
+                {0, 0, 1, Position[2]},
+                {0, 0, 0, 1 }
+            });
+
+            return (xRot, yRot, zRot, trans);
+        }
+
+        private (Matrix<double>, Matrix<double>, Matrix<double>, Matrix<double>) getInverseMatricies()
+        {
+            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1, 0, 0, 0 },
+                {0, Math.Cos(-Rotation[0]), -Math.Sin(-Rotation[0]), 0 },
+                {0, Math.Sin(-Rotation[0]), Math.Cos(-Rotation[0]), 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(-Rotation[1]), 0, -Math.Sin(-Rotation[1]), 0 },
+                {0, 1, 0, 0 },
+                {Math.Sin(-Rotation[1]), 0, Math.Cos(-Rotation[1]), 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(-Rotation[2]), -Math.Sin(-Rotation[2]), 0, 0 },
+                {Math.Sin(-Rotation[2]), Math.Cos(-Rotation[2]), 0, 0 },
+                {0, 0, 1, 0 },
+                {0, 0, 0, 1 }
+            });
+
+            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1, 0, 0, -Position[0]},
+                {0, 1, 0, -Position[1]},
+                {0, 0, 1, -Position[2]},
+                {0, 0, 0, 1 }
+            });
+
+            return (xRot, yRot, zRot, trans);
         }
 
         protected Vector<double> Transform(Vector<double> v)
         {
-            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, 0 },
-                {0, Math.Cos(rotation[0]), -Math.Sin(rotation[0]), 0 },
-                {0, Math.Sin(rotation[0]), Math.Cos(rotation[0]), 0 },
-                {0, 0, 0, 1 }
-            });
+            var (xRot, yRot, zRot, trans) = getMatricies();
+            return trans * xRot * yRot * zRot * v.PointwiseMultiply(Scale);
+        }
 
-            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(rotation[1]), 0, -Math.Sin(rotation[1]), 0 },
-                {0, 1, 0, 0 },
-                {Math.Sin(rotation[1]), 0, Math.Cos(rotation[1]), 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(rotation[2]), -Math.Sin(rotation[2]), 0, 0 },
-                {Math.Sin(rotation[2]), Math.Cos(rotation[2]), 0, 0 },
-                {0, 0, 1, 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, position[0]},
-                {0, 1, 0, position[1]},
-                {0, 0, 1, position[2]},
-                {0, 0, 0, 1 }
-            });
-
-            return trans * xRot * yRot * zRot * v.PointwiseMultiply(scale);
+        protected IEnumerable<Vector<double>> Transform(IEnumerable<Vector<double>> v)
+        {
+            var (xRot, yRot, zRot, trans) = getMatricies();
+            return v.Select(u => trans * xRot * yRot * zRot * u.PointwiseMultiply(Scale));
         }
 
         protected Vector<double> InverseTransform(Vector<double> v)
         {
-            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, 0 },
-                {0, Math.Cos(-rotation[0]), -Math.Sin(-rotation[0]), 0 },
-                {0, Math.Sin(-rotation[0]), Math.Cos(-rotation[0]), 0 },
-                {0, 0, 0, 1 }
-            });
+            var (xRot, yRot, zRot, trans) = getInverseMatricies();
+            return (zRot * yRot * xRot * trans * v).PointwiseDivide(Scale);
+        }
 
-            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(-rotation[1]), 0, -Math.Sin(-rotation[1]), 0 },
-                {0, 1, 0, 0 },
-                {Math.Sin(-rotation[1]), 0, Math.Cos(-rotation[1]), 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(-rotation[2]), -Math.Sin(-rotation[2]), 0, 0 },
-                {Math.Sin(-rotation[2]), Math.Cos(-rotation[2]), 0, 0 },
-                {0, 0, 1, 0 },
-                {0, 0, 0, 1 }
-            });
-
-            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, -position[0]},
-                {0, 1, 0, -position[1]},
-                {0, 0, 1, -position[2]},
-                {0, 0, 0, 1 }
-            });
-
-            return (zRot * yRot * xRot * trans * v).PointwiseDivide(scale);
+        protected IEnumerable<Vector<double>> InverseTransform(IEnumerable<Vector<double>> v)
+        {
+            var (xRot, yRot, zRot, trans) = getInverseMatricies();
+            return v.Select(u => trans * xRot * yRot * zRot * u.PointwiseMultiply(Scale));
         }
     }
 }
