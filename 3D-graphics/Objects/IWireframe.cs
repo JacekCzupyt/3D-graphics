@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace _3D_graphics.Objects
 {
-    interface IWireframeObject
+    interface IWireframe
     {
         IEnumerable<(Vector<double>, Vector<double>)> GetLines();
     }
+
+    interface IWireframeObject : IWireframe, I3DObject { }
 
     abstract class AbstractWireframeObject : Abstract3DObject, IWireframeObject
     {

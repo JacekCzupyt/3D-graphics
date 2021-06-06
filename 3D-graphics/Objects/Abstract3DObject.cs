@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace _3D_graphics.Objects
 {
-    abstract class Abstract3DObject
+    abstract class Abstract3DObject : I3DObject
     {
 
         private Vector<double> rotation;
