@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Shapes;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using _3D_graphics.Objects;
 
 namespace _3D_graphics
 {

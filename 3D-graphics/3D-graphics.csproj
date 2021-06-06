@@ -64,13 +64,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="IWireframeObject.cs" />
-    <Compile Include="Abstract3DObject.cs" />
+    <Compile Include="Objects\IWireframeObject.cs" />
+    <Compile Include="Objects\Abstract3DObject.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Box.cs" />
+    <Compile Include="Objects\Box.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

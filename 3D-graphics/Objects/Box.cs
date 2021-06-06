@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 
-namespace _3D_graphics
+namespace _3D_graphics.Objects
 {
     class Box : AbstractWireframeObject
     {
