@@ -30,7 +30,7 @@ namespace _3D_graphics.Objects
             this.screen.SizeChanged += SetVerticalFov;
         }
 
-        public void DrawScene(IEnumerable<IWireframeObject> scene)
+        public void DrawScene(IEnumerable<IWireframe> scene)
         {
             screen.Children.Clear();
 
@@ -44,8 +44,8 @@ namespace _3D_graphics.Objects
 
             foreach(var line in lines)
             {
-                var p1 = cameraToScreenMatrix * WorldToCamera(line.Item1, projectionMatrix));
-                var p2 = cameraToScreenMatrix * WorldToCamera(line.Item2, projectionMatrix));
+                var p1 = cameraToScreenMatrix * WorldToCamera(line.Item1, projectionMatrix);
+                var p2 = cameraToScreenMatrix * WorldToCamera(line.Item2, projectionMatrix);
                 DrawLine(p1, p2);
             }
         }

@@ -24,9 +24,9 @@ namespace _3D_graphics.Objects
             Vector<double> scale = null
             )
         {
-            this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
             this.Position = position ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
-            this.Rotation = rotation ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
+            this.Rotation = rotation ?? Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
+            this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
         }
 
         protected Matrix<double> getTransformationMatrix()
@@ -66,7 +66,7 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, Scale[3] }
             });
 
-            return xRot * yRot * zRot * trans * scale;
+            return trans * xRot * yRot * zRot * scale;
         }
 
         protected Matrix<double> getInverseMatrix()

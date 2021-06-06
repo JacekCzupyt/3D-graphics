@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _3D_graphics.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,8 +32,7 @@ namespace _3D_graphics
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeFov();
-            DrawDisplay();
+            MainCamera = new Camera(MainDisplayCanvas);
             InitializeTimer();
         }
 
@@ -48,13 +48,8 @@ namespace _3D_graphics
         {
             Ticks++;
             double time = 0.02 * Ticks;
-            cube.Rotation[1] = time * Math.PI / 2;
-            DrawDisplay();
-        }
-
-        private void MainDisplayCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            InitializeFov();
+            Scene.ForEach(o => o.Rotation[1] = time * Math.PI / 2);
+            MainCamera.DrawScene(Scene);
         }
     }
 }
