@@ -10,7 +10,7 @@ namespace _3D_graphics
 {
     partial class MainWindow : Window
     {
-        private void Movement(double dt)
+        private void CameraMovement(double dt)
         {
             const double velocity = 5;
 
@@ -28,6 +28,24 @@ namespace _3D_graphics
                 MainCamera.Position[1] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.F))
                 MainCamera.Position[1] -= dt * velocity;
+        }
+
+        private Point previousMousePos;
+
+        private void CameraRotation()
+        {
+            const double MouseSensetivity = 0.004;
+
+            Point mousePos = Mouse.GetPosition(MainDisplayCanvas);
+
+            if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                Vector deltaMouse = mousePos - previousMousePos;
+                MainCamera.Rotation[1] -= deltaMouse.X * MouseSensetivity;
+                MainCamera.Rotation[0] += Math.Max(Math.Min(Math.PI/2, deltaMouse.Y * MouseSensetivity), -Math.PI/2);
+            }
+
+            previousMousePos = mousePos;
         }
 
     }

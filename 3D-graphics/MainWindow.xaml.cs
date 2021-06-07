@@ -49,7 +49,8 @@ namespace _3D_graphics
         {
             Ticks++;
             double dt = deltaTime * 0.001d;
-            Movement(dt);
+            CameraMovement(dt);
+            CameraRotation();
             double time = Ticks * dt;
             NewFrame(time);
         }
