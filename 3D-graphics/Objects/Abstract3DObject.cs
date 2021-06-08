@@ -31,21 +31,28 @@ namespace _3D_graphics.Objects
 
         protected Matrix<double> getTransformationMatrix()
         {
-            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Scale[0], 0, 0, 0},
+                {0, Scale[1], 0, 0},
+                {0, 0, Scale[2], 0},
+                {0, 0, 0, Scale[3] }
+            });
+
+            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
                 {0, Math.Cos(Rotation[0]), -Math.Sin(Rotation[0]), 0 },
                 {0, Math.Sin(Rotation[0]), Math.Cos(Rotation[0]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(Rotation[1]), 0, -Math.Sin(Rotation[1]), 0 },
                 {0, 1, 0, 0 },
                 {Math.Sin(Rotation[1]), 0, Math.Cos(Rotation[1]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(Rotation[2]), -Math.Sin(Rotation[2]), 0, 0 },
                 {Math.Sin(Rotation[2]), Math.Cos(Rotation[2]), 0, 0 },
                 {0, 0, 1, 0 },
@@ -58,34 +65,62 @@ namespace _3D_graphics.Objects
                 {0, 0, 1, Position[2]},
                 {0, 0, 0, 1 }
             });
-            
-            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Scale[0], 0, 0, 0},
-                {0, Scale[1], 0, 0},
-                {0, 0, Scale[2], 0},
-                {0, 0, 0, Scale[3] }
-            });
 
-            return trans * xRot * yRot * zRot * scale;
+            return trans * yaw * pitch * roll * scale;
+        }
+
+        public void DecomposeMatrix(Matrix<double> matrix)
+        {
+            this.Position = matrix.Column(3);
+            matrix.SetColumn(3, new double[]{ 0, 0, 0, 1});
+
+            Vector<double> scale = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
+            for(int i = 0; i < 4; i++)
+            {
+                scale[i] = matrix.Column(i).L2Norm();
+                matrix.SetColumn(i, matrix.Column(i) / scale[i]);
+            }
+            this.Scale = scale;
+
+            Vector<double> rot = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
+            rot[1] = -Math.Asin(matrix[3, 0]);
+            double cosb = Math.Cos(rot[1]);
+            if (cosb == 0)
+            {
+                rot[0] = Math.Atan2(matrix[1, 2], matrix[0, 2]);
+            }
+            else
+            {
+                rot[0] = Math.Atan2(matrix[1, 0] / cosb, matrix[0, 0] / cosb);
+                rot[2] = Math.Atan2(matrix[2, 1] / cosb, matrix[2, 2] / cosb);
+            }
+            this.Rotation = rot;
         }
 
         protected Matrix<double> getInverseMatrix()
         {
-            Matrix<double> xRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {1/Scale[0], 0, 0, 0},
+                {0, 1/Scale[1], 0, 0},
+                {0, 0, 1/Scale[2], 0},
+                {0, 0, 0, 1/Scale[3] }
+            });
+
+            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
                 {0, Math.Cos(-Rotation[0]), -Math.Sin(-Rotation[0]), 0 },
                 {0, Math.Sin(-Rotation[0]), Math.Cos(-Rotation[0]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> yRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(-Rotation[1]), 0, -Math.Sin(-Rotation[1]), 0 },
                 {0, 1, 0, 0 },
                 {Math.Sin(-Rotation[1]), 0, Math.Cos(-Rotation[1]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> zRot = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(-Rotation[2]), -Math.Sin(-Rotation[2]), 0, 0 },
                 {Math.Sin(-Rotation[2]), Math.Cos(-Rotation[2]), 0, 0 },
                 {0, 0, 1, 0 },
@@ -99,14 +134,7 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1/Scale[0], 0, 0, 0},
-                {0, 1/Scale[1], 0, 0},
-                {0, 0, 1/Scale[2], 0},
-                {0, 0, 0, 1/Scale[3] }
-            });
-
-            return scale * zRot * yRot * xRot * trans;
+            return scale * yaw * pitch * roll * trans;
         }
     }
 }
