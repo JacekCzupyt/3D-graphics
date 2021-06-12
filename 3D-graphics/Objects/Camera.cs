@@ -50,10 +50,21 @@ namespace _3D_graphics.Objects
                 if (cutLine == null)
                     continue;
 
-                var p1 = cameraToScreenMatrix * WorldToCamera(cutLine.Value.Item1, projectionMatrix);
-                var p2 = cameraToScreenMatrix * WorldToCamera(cutLine.Value.Item2, projectionMatrix);
+                var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
+                var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
+
+                if (OutOfBounds(cp1) && OutOfBounds(cp2))
+                    continue;
+
+                var p1 = cameraToScreenMatrix * cp1;
+                var p2 = cameraToScreenMatrix * cp2;
                 DrawLine(p1, p2);
             }
+        }
+
+        private bool OutOfBounds(Vector<double> vec)
+        {
+            return vec[0] < -1 || vec[0] > 1 || vec[1] < -1 || vec[1] > 1;
         }
 
         private (Vector<double>, Vector<double>)? Cutoff((Vector<double>, Vector<double>) line, double cutoff, double mod = 1)
