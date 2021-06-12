@@ -21,6 +21,10 @@ namespace _3D_graphics
             new Cone(
                 position:Vector<double>.Build.DenseOfArray(new double[] { 5, 0, 3, 1 }),
                 density:30
+            ),
+            new Sphere(
+                position:Vector<double>.Build.DenseOfArray(new double[] { -5, 0, 3, 1 }),
+                density:200
             )
         };
 
