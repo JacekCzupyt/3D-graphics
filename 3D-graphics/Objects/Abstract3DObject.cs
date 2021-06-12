@@ -29,7 +29,7 @@ namespace _3D_graphics.Objects
             this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
         }
 
-        protected Matrix<double> getTransformationMatrix()
+        public Matrix<double> getTransformationMatrix()
         {
             Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Scale[0], 0, 0, 0},
@@ -38,21 +38,21 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, Scale[3] }
             });
 
-            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
                 {0, Math.Cos(Rotation[0]), -Math.Sin(Rotation[0]), 0 },
                 {0, Math.Sin(Rotation[0]), Math.Cos(Rotation[0]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(Rotation[1]), 0, -Math.Sin(Rotation[1]), 0 },
+            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(Rotation[1]), 0, Math.Sin(Rotation[1]), 0 },
                 {0, 1, 0, 0 },
-                {Math.Sin(Rotation[1]), 0, Math.Cos(Rotation[1]), 0 },
+                {-Math.Sin(Rotation[1]), 0, Math.Cos(Rotation[1]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(Rotation[2]), -Math.Sin(Rotation[2]), 0, 0 },
                 {Math.Sin(Rotation[2]), Math.Cos(Rotation[2]), 0, 0 },
                 {0, 0, 1, 0 },
@@ -83,16 +83,16 @@ namespace _3D_graphics.Objects
             this.Scale = scale;
 
             Vector<double> rot = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
-            rot[1] = -Math.Asin(matrix[3, 0]);
-            double cosb = Math.Cos(rot[1]);
-            if (cosb == 0)
+            rot[0] = Math.Asin(- matrix[1, 2]);
+            double cosx = Math.Cos(rot[0]);
+            if (cosx == 0)
             {
-                rot[0] = Math.Atan2(matrix[1, 2], matrix[0, 2]);
+                rot[1] = Math.Atan2( - matrix[2, 0], - matrix[2, 1]);
             }
             else
             {
-                rot[0] = Math.Atan2(matrix[1, 0] / cosb, matrix[0, 0] / cosb);
-                rot[2] = Math.Atan2(matrix[2, 1] / cosb, matrix[2, 2] / cosb);
+                rot[1] = Math.Atan2(matrix[0, 2] / cosx, matrix[2, 2] / cosx);
+                rot[2] = Math.Atan2(matrix[1, 0] / cosx, matrix[1, 1] / cosx);
             }
             this.Rotation = rot;
         }
@@ -106,21 +106,21 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, 1/Scale[3] }
             });
 
-            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {1, 0, 0, 0 },
                 {0, Math.Cos(-Rotation[0]), -Math.Sin(-Rotation[0]), 0 },
                 {0, Math.Sin(-Rotation[0]), Math.Cos(-Rotation[0]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(-Rotation[1]), 0, -Math.Sin(-Rotation[1]), 0 },
+            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
+                {Math.Cos(-Rotation[1]), 0, Math.Sin(-Rotation[1]), 0 },
                 {0, 1, 0, 0 },
-                {Math.Sin(-Rotation[1]), 0, Math.Cos(-Rotation[1]), 0 },
+                {-Math.Sin(-Rotation[1]), 0, Math.Cos(-Rotation[1]), 0 },
                 {0, 0, 0, 1 }
             });
 
-            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
+            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Math.Cos(-Rotation[2]), -Math.Sin(-Rotation[2]), 0, 0 },
                 {Math.Sin(-Rotation[2]), Math.Cos(-Rotation[2]), 0, 0 },
                 {0, 0, 1, 0 },
@@ -134,7 +134,7 @@ namespace _3D_graphics.Objects
                 {0, 0, 0, 1 }
             });
 
-            return scale * yaw * pitch * roll * trans;
+            return scale * roll * pitch * yaw * trans;
         }
     }
 }

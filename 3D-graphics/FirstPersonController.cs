@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,20 +15,24 @@ namespace _3D_graphics
         {
             const double velocity = 5;
 
+            Matrix<double> translation = Matrix<double>.Build.DenseIdentity(4, 4);
+
             if (Keyboard.IsKeyDown(Key.D))
-                MainCamera.Position[0] += dt * velocity;
+                translation[0, 3] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.A))
-                MainCamera.Position[0] -= dt * velocity;
+                translation[0, 3] -= dt * velocity;
             
             if (Keyboard.IsKeyDown(Key.W))
-                MainCamera.Position[2] += dt * velocity;
+                translation[2, 3] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.S))
-                MainCamera.Position[2] -= dt * velocity;
+                translation[2, 3] -= dt * velocity;
 
             if (Keyboard.IsKeyDown(Key.R))
-                MainCamera.Position[1] += dt * velocity;
+                translation[1, 3] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.F))
-                MainCamera.Position[1] -= dt * velocity;
+                translation[1, 3] -= dt * velocity;
+
+            MainCamera.DecomposeMatrix(MainCamera.getTransformationMatrix() * translation);
         }
 
         private Point previousMousePos;
@@ -41,8 +46,9 @@ namespace _3D_graphics
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
                 Vector deltaMouse = mousePos - previousMousePos;
-                MainCamera.Rotation[1] -= deltaMouse.X * MouseSensetivity;
-                MainCamera.Rotation[0] += Math.Max(Math.Min(Math.PI/2, deltaMouse.Y * MouseSensetivity), -Math.PI/2);
+                MainCamera.Rotation[1] += deltaMouse.X * MouseSensetivity;
+                MainCamera.Rotation[0] += deltaMouse.Y * MouseSensetivity;
+                MainCamera.Rotation[0] = Math.Max(Math.Min(Math.PI / 2, MainCamera.Rotation[0]), -Math.PI / 2);
             }
 
             previousMousePos = mousePos;
