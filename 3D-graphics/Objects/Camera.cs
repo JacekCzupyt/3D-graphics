@@ -18,6 +18,8 @@ namespace _3D_graphics.Objects
         public double XFov { get => xFov; set { xFov = value; SetVerticalFov(); } }
         public double YFov { get; private set; }
 
+        public double CutoffNearPlane { get; set; } = 0.1d;
+
         public Camera(
             Canvas screen,
             double Fov = Math.PI/2,
@@ -44,10 +46,30 @@ namespace _3D_graphics.Objects
 
             foreach(var line in lines)
             {
-                var p1 = cameraToScreenMatrix * WorldToCamera(line.Item1, projectionMatrix);
-                var p2 = cameraToScreenMatrix * WorldToCamera(line.Item2, projectionMatrix);
+                var cutLine = Cutoff(line, CutoffNearPlane);
+                if (cutLine == null)
+                    continue;
+
+                var p1 = cameraToScreenMatrix * WorldToCamera(cutLine.Value.Item1, projectionMatrix);
+                var p2 = cameraToScreenMatrix * WorldToCamera(cutLine.Value.Item2, projectionMatrix);
                 DrawLine(p1, p2);
             }
+        }
+
+        private (Vector<double>, Vector<double>)? Cutoff((Vector<double>, Vector<double>) line, double cutoff, double mod = 1)
+        {
+            if (line.Item1[2] * mod < cutoff * mod && line.Item2[2] * mod < cutoff * mod)
+                return null;
+
+            if (line.Item1[2] * mod >= cutoff * mod && line.Item2[2] * mod >= cutoff * mod)
+                return line;
+
+            var intersection = line.Item1 + (line.Item2 - line.Item1) * (cutoff - line.Item1[2]) / (line.Item2[2] - line.Item1[2]);
+
+            if (line.Item1[2] * mod < cutoff * mod)
+                return (intersection, line.Item2);
+            else
+                return (line.Item1, intersection);
         }
 
         private Matrix<double> getProjectionMatrix()
