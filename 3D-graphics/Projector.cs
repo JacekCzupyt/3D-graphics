@@ -12,11 +12,16 @@ namespace _3D_graphics
 {
     public partial class MainWindow : System.Windows.Window
     {
-        List<IWireframeObject> Scene = new List<IWireframeObject>() {new Box(
-            Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 3, 1 }),
-            Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 }),
-            Vector<double>.Build.DenseOfArray(new double[] { 2, 1, 1, 1 })
-            ) };
+        List<IWireframeObject> Scene = new List<IWireframeObject>() {
+            new Box(
+                Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 3, 1 }),
+                Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 }),
+                Vector<double>.Build.DenseOfArray(new double[] { 2, 1, 1, 1 })
+            ),
+            new Cylinder(
+                position:Vector<double>.Build.DenseOfArray(new double[] { 5, 0, 3, 1 })
+            )
+        };
 
         Camera MainCamera;
     }
