@@ -12,11 +12,15 @@ namespace _3D_graphics.Objects
     {
         private int NumSides
         {
-            //TODO: implement dynamic numsides
-            get => 10;
+            get { return Math.Max(3, (int)Math.Round(((double)DesiredMeshDensity + 2) / 3)); }
         }
 
-        public Cylinder(double height = 2, double radius = 1, Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null) : base(position, rotation, scale)
+        public Cylinder(
+            double height = 2, 
+            double radius = 1, 
+            Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null, 
+            int density = 40): 
+            base(position, rotation, scale, density)
         {
             Height = height;
             Radius = radius;

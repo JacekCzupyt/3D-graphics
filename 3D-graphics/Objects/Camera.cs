@@ -109,7 +109,7 @@ namespace _3D_graphics.Objects
             line.Y1 = v1[1];
             line.Y2 = v2[1];
 
-            line.StrokeThickness = 4;
+            line.StrokeThickness = 1;
             screen.Children.Add(line);
         }
 

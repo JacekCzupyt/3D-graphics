@@ -11,9 +11,8 @@ namespace _3D_graphics.Objects
     {
         static Vector<double> box_scale = Vector<double>.Build.DenseOfArray(new double[] { 0.5f, 0.5f, 0.5f, 1 });
 
-        public Box(Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null) : 
-            base(position, rotation, scale)
-        { }
+        public Box(Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null, int density = 40) : base(position, rotation, scale, density)
+        {}
 
         private IEnumerable<Triangle> GetTriangles()
         {
