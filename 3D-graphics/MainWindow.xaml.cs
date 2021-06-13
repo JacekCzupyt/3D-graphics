@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _3D_graphics.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace _3D_graphics
 {
@@ -20,7 +22,9 @@ namespace _3D_graphics
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Line line;
+        private DispatcherTimer dispatcherTimer;
+        int Ticks = 0;
+        const int deltaTime = 10;
 
         public MainWindow()
         {
@@ -29,16 +33,32 @@ namespace _3D_graphics
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            line = new Line();
-            line.Stroke = Brushes.LightSteelBlue;
+            MainCamera = new Camera(MainDisplayCanvas);
+            InitializeTimer();
+        }
 
-            line.X1 = 1;
-            line.X2 = 50;
-            line.Y1 = 1;
-            line.Y2 = 50;
+        private void InitializeTimer()
+        {
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, deltaTime);
+            dispatcherTimer.Start();
+        }
 
-            line.StrokeThickness = 2;
-            MainDisplayCanvas.Children.Add(line);
+        private void Tick(object sender, EventArgs e)
+        {
+            Ticks++;
+            double dt = deltaTime * 0.001d;
+            CameraMovement(dt);
+            CameraRotation();
+            double time = Ticks * dt;
+            NewFrame(dt);
+        }
+
+        private void NewFrame(double dt)
+        {
+            Scene.ForEach(o => o.Rotation[1] += dt * Math.PI / 2);
+            MainCamera.DrawScene(Scene);
         }
     }
 }

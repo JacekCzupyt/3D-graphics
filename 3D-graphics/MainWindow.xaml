@@ -3,12 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_3D_graphics"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Canvas x:Name="MainDisplayCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Save" Click="SaveScene"/>
+            <MenuItem Header="Load" Click="LoadScene"/>
+        </Menu>
+        <Grid>
+            <Canvas x:Name="MainDisplayCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                    Loaded="MainDisplayCanvas_Loaded"/>
-
-    </Grid>
+        </Grid>
+    </DockPanel>
 </Window>
