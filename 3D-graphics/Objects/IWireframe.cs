@@ -28,7 +28,7 @@ namespace _3D_graphics.Objects
 
         public IEnumerable<(Vector<double>, Vector<double>)> GetLines()
         {
-            var m = getTransformationMatrix();
+            var m = TransformationMatrix;
             return GetRawLines().Select(l => (m * l.Item1, m * l.Item2));
         }
 

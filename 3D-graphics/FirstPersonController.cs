@@ -32,7 +32,7 @@ namespace _3D_graphics
             if (Keyboard.IsKeyDown(Key.F))
                 translation[1, 3] -= dt * velocity;
 
-            MainCamera.DecomposeMatrix(MainCamera.getTransformationMatrix() * translation);
+            MainCamera.TransformationMatrix *= translation;
         }
 
         private Point previousMousePos;

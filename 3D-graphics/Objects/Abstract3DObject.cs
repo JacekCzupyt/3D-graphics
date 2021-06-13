@@ -29,7 +29,9 @@ namespace _3D_graphics.Objects
             this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
         }
 
-        public Matrix<double> getTransformationMatrix()
+        public Matrix<double> TransformationMatrix { get => getTransformationMatrix(); set => DecomposeMatrix(value); }
+
+        private Matrix<double> getTransformationMatrix()
         {
             Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
                 {Scale[0], 0, 0, 0},
@@ -69,7 +71,7 @@ namespace _3D_graphics.Objects
             return trans * yaw * pitch * roll * scale;
         }
 
-        public void DecomposeMatrix(Matrix<double> matrix)
+        private void DecomposeMatrix(Matrix<double> matrix)
         {
             this.Position = matrix.Column(3);
             matrix.SetColumn(3, new double[]{ 0, 0, 0, 1});
