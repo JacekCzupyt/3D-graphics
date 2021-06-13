@@ -4,15 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 
 namespace _3D_graphics.Objects
 {
+    [JsonObject(MemberSerialization.OptIn)]
     class Box : AbstractWireframeObject
     {
         static Vector<double> box_scale = Vector<double>.Build.DenseOfArray(new double[] { 0.5f, 0.5f, 0.5f, 1 });
 
         public Box(Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null, int density = 40) : base(position, rotation, scale, density)
         {}
+
+        [JsonConstructor]
+        public Box(int density, Matrix<double> transform)
+        {
+            TransformationMatrix = transform;
+            DesiredMeshDensity = density;
+        }
 
         private IEnumerable<Triangle> GetTriangles()
         {

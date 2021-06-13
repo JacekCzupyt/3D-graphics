@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace _3D_graphics.Objects
 {
+    [JsonObject(MemberSerialization.OptIn)]
     class Cone : AbstractWireframeObject
     {
         private int NumSides
@@ -25,7 +27,18 @@ namespace _3D_graphics.Objects
             Radius = radius;
         }
 
+        [JsonConstructor]
+        public Cone(int density, Matrix<double> transform, double Height, double Radius)
+        {
+            TransformationMatrix = transform;
+            DesiredMeshDensity = density;
+            this.Height = Height;
+            this.Radius = Radius;
+        }
+        
+        [JsonProperty]
         public double Height { get; set; }
+        [JsonProperty]
         public double Radius { get; set; }
 
         private IEnumerable<Triangle> GetTriangles()

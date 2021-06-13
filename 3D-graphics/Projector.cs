@@ -18,12 +18,16 @@ namespace _3D_graphics
                 Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 }),
                 Vector<double>.Build.DenseOfArray(new double[] { 2, 1, 1, 1 })
             ),
+            new Cylinder(
+                position:Vector<double>.Build.DenseOfArray(new double[] { 3, 0, 0, 1 }),
+                density:30
+            ),
             new Cone(
-                position:Vector<double>.Build.DenseOfArray(new double[] { 5, 0, 3, 1 }),
+                position:Vector<double>.Build.DenseOfArray(new double[] { -3, 0, 0, 1 }),
                 density:30
             ),
             new Sphere(
-                position:Vector<double>.Build.DenseOfArray(new double[] { -5, 0, 3, 1 }),
+                position:Vector<double>.Build.DenseOfArray(new double[] { 0, 0, -3, 1 }),
                 density:200
             )
         };

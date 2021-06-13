@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace _3D_graphics.Objects
 
     interface IWireframeObject : IWireframe, I3DObject { }
 
+    [JsonObject(MemberSerialization.OptIn)]
     abstract class AbstractWireframeObject : Abstract3DObject, IWireframeObject
     {
         protected AbstractWireframeObject(Vector<double> position = null, Vector<double> rotation = null, Vector<double> scale = null, int density = 40) :
@@ -24,6 +26,7 @@ namespace _3D_graphics.Objects
             DesiredMeshDensity = density;
         }
 
+        [JsonProperty("density")]
         public int DesiredMeshDensity { get; set; }
 
         public IEnumerable<(Vector<double>, Vector<double>)> GetLines()

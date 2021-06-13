@@ -1,12 +1,10 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _3D_graphics.Objects
 {
+    [JsonObject(MemberSerialization.OptIn)]
     abstract class Abstract3DObject : I3DObject
     {
 
@@ -29,6 +27,8 @@ namespace _3D_graphics.Objects
             this.Scale = scale ?? Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
         }
 
+        [JsonProperty("transform")]
+        [JsonConverter(typeof(JsonMatrixConverter))]
         public Matrix<double> TransformationMatrix { get => getTransformationMatrix(); set => DecomposeMatrix(value); }
 
         private Matrix<double> getTransformationMatrix()

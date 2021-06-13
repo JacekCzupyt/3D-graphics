@@ -1,10 +1,12 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace _3D_graphics.Objects
 {
+    [JsonObject(MemberSerialization.OptIn)]
     class Cylinder : AbstractWireframeObject
     {
         private int NumSides
@@ -23,7 +25,18 @@ namespace _3D_graphics.Objects
             Radius = radius;
         }
 
+        [JsonConstructor]
+        public Cylinder(int density, Matrix<double> transform, double Height, double Radius)
+        {
+            TransformationMatrix = transform;
+            DesiredMeshDensity = density;
+            this.Height = Height;
+            this.Radius = Radius;
+        }
+
+        [JsonProperty]
         public double Height { get; set; }
+        [JsonProperty]
         public double Radius { get; set; }
 
         private IEnumerable<Triangle> GetTriangles()

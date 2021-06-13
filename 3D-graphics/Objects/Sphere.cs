@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace _3D_graphics.Objects
 {
+    [JsonObject(MemberSerialization.OptIn)]
     class Sphere : AbstractWireframeObject
     {
         private int N
@@ -14,6 +16,7 @@ namespace _3D_graphics.Objects
             get { return Math.Max(3, (int)Math.Round(Math.Sqrt(DesiredMeshDensity / 2))); }
         }
 
+        [JsonProperty]
         public double Radius {get; set;}
         public Sphere(
             double radius = 1,
@@ -22,6 +25,14 @@ namespace _3D_graphics.Objects
             base(position, rotation, scale, density)
         {
             Radius = radius;
+        }
+
+        [JsonConstructor]
+        public Sphere(int density, Matrix<double> transform, double Radius)
+        {
+            TransformationMatrix = transform;
+            DesiredMeshDensity = density;
+            this.Radius = Radius;
         }
 
         private IEnumerable<Triangle> GetTriangles()

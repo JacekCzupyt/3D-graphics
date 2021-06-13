@@ -52,12 +52,12 @@ namespace _3D_graphics
             CameraMovement(dt);
             CameraRotation();
             double time = Ticks * dt;
-            NewFrame(time);
+            NewFrame(dt);
         }
 
-        private void NewFrame(double time)
+        private void NewFrame(double dt)
         {
-            Scene.ForEach(o => o.Rotation[1] = time * Math.PI / 2);
+            Scene.ForEach(o => o.Rotation[1] += dt * Math.PI / 2);
             MainCamera.DrawScene(Scene);
         }
     }
