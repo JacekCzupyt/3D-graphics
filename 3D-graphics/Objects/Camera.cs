@@ -53,7 +53,7 @@ namespace _3D_graphics.Objects
                 var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
                 var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
 
-                if (OutOfBounds(cp1) && OutOfBounds(cp2))
+                if (OutOfBounds((cp1, cp2)))
                     continue;
 
                 var p1 = cameraToScreenMatrix * cp1;
@@ -62,9 +62,12 @@ namespace _3D_graphics.Objects
             }
         }
 
-        private bool OutOfBounds(Vector<double> vec)
+        private bool OutOfBounds((Vector<double>, Vector<double>) l)
         {
-            return vec[0] < -1 || vec[0] > 1 || vec[1] < -1 || vec[1] > 1;
+            return (l.Item1[0] < -1 && l.Item2[0] < -1) ||
+                (l.Item1[0] >1 && l.Item2[0] >1) ||
+                (l.Item1[1] < -1 && l.Item2[1] < -1) ||
+                (l.Item1[1] >1 && l.Item2[1] >1);
         }
 
         private (Vector<double>, Vector<double>)? Cutoff((Vector<double>, Vector<double>) line, double cutoff, double mod = 1)
