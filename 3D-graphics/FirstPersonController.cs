@@ -33,6 +33,12 @@ namespace _3D_graphics
                 translation[1, 3] -= dt * velocity;
 
             MainCamera.TransformationMatrix *= translation;
+
+            const float EyeDist = 0.2f;
+            Matrix<double> translation2 = Matrix<double>.Build.DenseIdentity(4, 4);
+            translation2[0, 3] -= EyeDist;
+
+            SecondaryCamera.TransformationMatrix = MainCamera.TransformationMatrix * translation2;
         }
 
         private Point previousMousePos;

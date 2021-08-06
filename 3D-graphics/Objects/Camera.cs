@@ -20,22 +20,31 @@ namespace _3D_graphics.Objects
 
         public double CutoffNearPlane { get; set; } = 0.1d;
 
+        private System.Windows.Media.Brush brush;
+
         public Camera(
             Canvas screen,
+            System.Windows.Media.Brush brush,
             double Fov = Math.PI/2,
             Vector<double> position = null, 
             Vector<double> rotation = null, 
-            Vector<double> scale = null) : base(position, rotation, scale)
+            Vector<double> scale = null
+            ) : base(position, rotation, scale)
+            
         {
             this.screen = screen;
             this.XFov = Fov;
             this.screen.SizeChanged += SetVerticalFov;
+            this.brush = brush;
+        }
+
+        public void ClearScreen() {
+            screen.Children.Clear();
+
         }
 
         public void DrawScene(IEnumerable<IWireframe> scene)
         {
-            screen.Children.Clear();
-
             var projectionMatrix = getProjectionMatrix();
             var inverseTransformMatrix = getInverseMatrix();
             var cameraToScreenMatrix = getCameraToScreenMatrix();
@@ -116,7 +125,7 @@ namespace _3D_graphics.Objects
         private void DrawLine(Vector<double> v1, Vector<double> v2)
         {
             Line line = new Line();
-            line.Stroke = System.Windows.Media.Brushes.Black;
+            line.Stroke = brush;
 
             line.X1 = v1[0];
             line.X2 = v2[0];

@@ -33,7 +33,12 @@ namespace _3D_graphics
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            MainCamera = new Camera(MainDisplayCanvas);
+            MainCamera = new Camera(MainDisplayCanvas, System.Windows.Media.Brushes.Red);
+
+            var converter = new System.Windows.Media.BrushConverter();
+            var brush = (Brush)converter.ConvertFromString("#00f7ff");
+
+            SecondaryCamera = new Camera(MainDisplayCanvas, brush);
             InitializeTimer();
         }
 
@@ -49,8 +54,8 @@ namespace _3D_graphics
         {
             Ticks++;
             double dt = deltaTime * 0.001d;
-            CameraMovement(dt);
             CameraRotation();
+            CameraMovement(dt);
             double time = Ticks * dt;
             NewFrame(dt);
         }
@@ -58,7 +63,9 @@ namespace _3D_graphics
         private void NewFrame(double dt)
         {
             Scene.ForEach(o => o.Rotation[1] += dt * Math.PI / 2);
+            MainCamera.ClearScreen();
             MainCamera.DrawScene(Scene);
+            SecondaryCamera.DrawScene(Scene);
         }
     }
 }

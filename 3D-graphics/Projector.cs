@@ -20,18 +20,19 @@ namespace _3D_graphics
             ),
             new Cylinder(
                 position:Vector<double>.Build.DenseOfArray(new double[] { 3, 0, 0, 1 }),
-                density:30
+                density:10
             ),
             new Cone(
                 position:Vector<double>.Build.DenseOfArray(new double[] { -3, 0, 0, 1 }),
-                density:30
+                density:10
             ),
             new Sphere(
                 position:Vector<double>.Build.DenseOfArray(new double[] { 0, 0, -3, 1 }),
-                density:200
+                density:60
             )
         };
 
         Camera MainCamera;
+        Camera SecondaryCamera;
     }
 }
