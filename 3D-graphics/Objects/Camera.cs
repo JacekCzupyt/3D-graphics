@@ -46,7 +46,7 @@ namespace _3D_graphics.Objects
         public void DrawScene(IEnumerable<IWireframe> scene)
         {
             var projectionMatrix = getProjectionMatrix();
-            var inverseTransformMatrix = getInverseMatrix();
+            var inverseTransformMatrix = GetInverseMatrix();
             var cameraToScreenMatrix = getCameraToScreenMatrix();
 
             var lines = scene.ToList()

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using _3D_graphics.Objects;
 
 namespace _3D_graphics
 {
@@ -15,24 +16,24 @@ namespace _3D_graphics
         {
             const double velocity = 5;
 
-            Matrix<double> translation = Matrix<double>.Build.DenseIdentity(4, 4);
+            var transVec = Vector<double>.Build.Dense(3);
 
             if (Keyboard.IsKeyDown(Key.D))
-                translation[0, 3] += dt * velocity;
+                transVec[0] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.A))
-                translation[0, 3] -= dt * velocity;
+                transVec[0] -= dt * velocity;
             
             if (Keyboard.IsKeyDown(Key.W))
-                translation[2, 3] += dt * velocity;
+                transVec[2] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.S))
-                translation[2, 3] -= dt * velocity;
+                transVec[2] -= dt * velocity;
 
             if (Keyboard.IsKeyDown(Key.R))
-                translation[1, 3] += dt * velocity;
+                transVec[1] += dt * velocity;
             if (Keyboard.IsKeyDown(Key.F))
-                translation[1, 3] -= dt * velocity;
+                transVec[1] -= dt * velocity;
 
-            MainCamera.TransformationMatrix *= translation;
+            MainCamera.TransformationMatrix *= Abstract3DObject.Translate(transVec);
 
             const float EyeDist = 0.2f;
             Matrix<double> translation2 = Matrix<double>.Build.DenseIdentity(4, 4);

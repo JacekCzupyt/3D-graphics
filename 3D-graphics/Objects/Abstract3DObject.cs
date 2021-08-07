@@ -5,16 +5,13 @@ using System;
 namespace _3D_graphics.Objects
 {
     [JsonObject(MemberSerialization.OptIn)]
-    abstract class Abstract3DObject : I3DObject
+    internal abstract class Abstract3DObject : I3DObject
     {
+        public Vector<double> Scale { get; set; }
 
-        private Vector<double> rotation;
-        private Vector<double> scale;
-        private Vector<double> position;
+        public Vector<double> Position { get; set; }
 
-        public virtual Vector<double> Scale { get => scale; set => scale = value; }
-        public virtual Vector<double> Position { get => position; set => position = value; }
-        public virtual Vector<double> Rotation { get => rotation; set => rotation = value; }
+        public Vector<double> Rotation { get; set; }
 
         protected Abstract3DObject(
             Vector<double> position = null, 
@@ -29,44 +26,18 @@ namespace _3D_graphics.Objects
 
         [JsonProperty("transform")]
         [JsonConverter(typeof(JsonMatrixConverter))]
-        public Matrix<double> TransformationMatrix { get => getTransformationMatrix(); set => DecomposeMatrix(value); }
+        public Matrix<double> TransformationMatrix { get => GetTransformationMatrix(); set => DecomposeMatrix(value); }
 
-        private Matrix<double> getTransformationMatrix()
-        {
-            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Scale[0], 0, 0, 0},
-                {0, Scale[1], 0, 0},
-                {0, 0, Scale[2], 0},
-                {0, 0, 0, Scale[3] }
-            });
+        private Matrix<double> GetTransformationMatrix() {
+            var scale = ChangeScale(Scale);
 
-            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, 0 },
-                {0, Math.Cos(Rotation[0]), -Math.Sin(Rotation[0]), 0 },
-                {0, Math.Sin(Rotation[0]), Math.Cos(Rotation[0]), 0 },
-                {0, 0, 0, 1 }
-            });
+            var pitch = RotatePitch(Rotation[0]);
 
-            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(Rotation[1]), 0, Math.Sin(Rotation[1]), 0 },
-                {0, 1, 0, 0 },
-                {-Math.Sin(Rotation[1]), 0, Math.Cos(Rotation[1]), 0 },
-                {0, 0, 0, 1 }
-            });
+            var yaw = RotateYaw(Rotation[1]);
 
-            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(Rotation[2]), -Math.Sin(Rotation[2]), 0, 0 },
-                {Math.Sin(Rotation[2]), Math.Cos(Rotation[2]), 0, 0 },
-                {0, 0, 1, 0 },
-                {0, 0, 0, 1 }
-            });
+            var roll = RotateRoll(Rotation[2]);
 
-            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, Position[0]},
-                {0, 1, 0, Position[1]},
-                {0, 0, 1, Position[2]},
-                {0, 0, 0, 1 }
-            });
+            var trans = Translate(Position);
 
             return trans * yaw * pitch * roll * scale;
         }
@@ -76,17 +47,18 @@ namespace _3D_graphics.Objects
             this.Position = matrix.Column(3);
             matrix.SetColumn(3, new double[]{ 0, 0, 0, 1});
 
-            Vector<double> scale = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
-            for(int i = 0; i < 4; i++)
+            var scale = Vector<double>.Build.DenseOfArray(new double[] { 1, 1, 1, 1 });
+            for(var i = 0; i < 4; i++)
             {
                 scale[i] = matrix.Column(i).L2Norm();
                 matrix.SetColumn(i, matrix.Column(i) / scale[i]);
             }
             this.Scale = scale;
 
-            Vector<double> rot = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
+            var rot = Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 1 });
             rot[0] = Math.Asin(- matrix[1, 2]);
-            double cosx = Math.Cos(rot[0]);
+            // ReSharper disable once IdentifierTypo
+            var cosx = Math.Cos(rot[0]);
             if (cosx == 0)
             {
                 rot[1] = Math.Atan2( - matrix[2, 0], - matrix[2, 1]);
@@ -99,44 +71,72 @@ namespace _3D_graphics.Objects
             this.Rotation = rot;
         }
 
-        protected Matrix<double> getInverseMatrix()
-        {
-            Matrix<double> scale = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1/Scale[0], 0, 0, 0},
-                {0, 1/Scale[1], 0, 0},
-                {0, 0, 1/Scale[2], 0},
-                {0, 0, 0, 1/Scale[3] }
-            });
+        protected Matrix<double> GetInverseMatrix() {
+            var scale = ChangeScale(1 / Scale);
 
-            Matrix<double> pitch = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, 0 },
-                {0, Math.Cos(-Rotation[0]), -Math.Sin(-Rotation[0]), 0 },
-                {0, Math.Sin(-Rotation[0]), Math.Cos(-Rotation[0]), 0 },
+            var pitch = RotatePitch(-Rotation[0]);
+
+            var yaw = RotateYaw(-Rotation[1]);
+
+            var roll = RotateRoll(-Rotation[2]);
+
+            var trans = Translate(-Position);
+
+            return scale * roll * pitch * yaw * trans;
+        }
+
+        public static Matrix<double> Translate(double x, double y, double z) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {1, 0, 0, x},
+                {0, 1, 0, y},
+                {0, 0, 1, z},
                 {0, 0, 0, 1 }
             });
+        }
+        
+        public static Matrix<double> Translate(Vector<double> vec) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {1, 0, 0, vec[0]},
+                {0, 1, 0, vec[1]},
+                {0, 0, 1, vec[2]},
+                {0, 0, 0, 1 }
+            });
+        }
 
-            Matrix<double> yaw = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(-Rotation[1]), 0, Math.Sin(-Rotation[1]), 0 },
+        public static Matrix<double> RotateYaw(double rad) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {Math.Cos(rad), 0, Math.Sin(rad), 0 },
                 {0, 1, 0, 0 },
-                {-Math.Sin(-Rotation[1]), 0, Math.Cos(-Rotation[1]), 0 },
+                {-Math.Sin(rad), 0, Math.Cos(rad), 0 },
                 {0, 0, 0, 1 }
             });
-
-            Matrix<double> roll = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {Math.Cos(-Rotation[2]), -Math.Sin(-Rotation[2]), 0, 0 },
-                {Math.Sin(-Rotation[2]), Math.Cos(-Rotation[2]), 0, 0 },
+        }
+        
+        public static Matrix<double> RotatePitch(double rad) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {1, 0, 0, 0 },
+                {0, Math.Cos(rad), -Math.Sin(rad), 0 },
+                {0, Math.Sin(rad), Math.Cos(rad), 0 },
+                {0, 0, 0, 1 }
+            });
+        }
+        
+        public static Matrix<double> RotateRoll(double rad) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {Math.Cos(rad), -Math.Sin(rad), 0, 0 },
+                {Math.Sin(rad), Math.Cos(rad), 0, 0 },
                 {0, 0, 1, 0 },
                 {0, 0, 0, 1 }
             });
-
-            Matrix<double> trans = Matrix<double>.Build.DenseOfArray(new double[,] {
-                {1, 0, 0, -Position[0]},
-                {0, 1, 0, -Position[1]},
-                {0, 0, 1, -Position[2]},
-                {0, 0, 0, 1 }
+        }
+        
+        public static Matrix<double> ChangeScale(Vector<double> vec) {
+            return Matrix<double>.Build.DenseOfArray(new[,] {
+                {vec[0], 0, 0, 0},
+                {0, vec[1], 0, 0},
+                {0, 0, vec[2], 0},
+                {0, 0, 0, vec[3] }
             });
-
-            return scale * roll * pitch * yaw * trans;
         }
     }
 }
