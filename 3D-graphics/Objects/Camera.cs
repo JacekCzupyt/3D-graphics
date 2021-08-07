@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace _3D_graphics.Objects
@@ -42,39 +44,12 @@ namespace _3D_graphics.Objects
             this.XFov = fov;
             this.Screen.SizeChanged += SetVerticalFov;
             this.Brush = brush;
+            Brush.Freeze();
         }
 
         public void ClearScreen() {
             Screen.Children.Clear();
 
-        }
-
-        public void DrawScene(IEnumerable<IWireframe> scene)
-        {
-            var projectionMatrix = GetProjectionMatrix();
-            var inverseTransformMatrix = GetInverseMatrix();
-            var cameraToScreenMatrix = GetCameraToScreenMatrix();
-
-            var lines = scene.ToList()
-                .SelectMany(o => o.GetLines())
-                .Select(l => (inverseTransformMatrix * l.Item1, inverseTransformMatrix * l.Item2));
-
-            foreach(var line in lines)
-            {
-                var cutLine = Cutoff(line, CutoffNearPlane);
-                if (cutLine == null)
-                    continue;
-
-                var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
-                var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
-
-                if (OutOfBounds((cp1, cp2)))
-                    continue;
-
-                var p1 = cameraToScreenMatrix * cp1;
-                var p2 = cameraToScreenMatrix * cp2;
-                DrawLine(p1, p2);
-            }
         }
 
         private bool OutOfBounds((Vector<double>, Vector<double>) l)
@@ -124,19 +99,49 @@ namespace _3D_graphics.Objects
             return v / v[2];
         }
 
-        private void DrawLine(Vector<double> v1, Vector<double> v2)
+        public void DrawScene(IEnumerable<IWireframe> scene)
         {
-            var line = new Line
+            Rect rect = new Rect();
+            rect.Width = Screen.ActualWidth;
+            rect.Height = Screen.ActualHeight;
+            DrawingVisual drawingVisual = new DrawingVisual();
+            using (var draw = drawingVisual.RenderOpen())
             {
-                Stroke = Brush,
-                X1 = v1[0],
-                X2 = v2[0],
-                Y1 = v1[1],
-                Y2 = v2[1],
-                StrokeThickness = 1
-            };
-            
-            Screen.Children.Add(line);
+                var projectionMatrix = GetProjectionMatrix();
+                var inverseTransformMatrix = GetInverseMatrix();
+                var cameraToScreenMatrix = GetCameraToScreenMatrix();
+
+                var lines = scene.ToList()
+                    .SelectMany(o => o.GetLines())
+                    .Select(l => (inverseTransformMatrix * l.Item1, inverseTransformMatrix * l.Item2));
+
+                foreach(var line in lines)
+                {
+                    var cutLine = Cutoff(line, CutoffNearPlane);
+                    if (cutLine == null)
+                        continue;
+
+                    var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
+                    var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
+
+                    if (OutOfBounds((cp1, cp2)))
+                        continue;
+
+                    var p1 = cameraToScreenMatrix * cp1;
+                    var p2 = cameraToScreenMatrix * cp2;
+                    DrawLine(p1, p2, draw);
+                }
+            }
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
+            rtb.Render(drawingVisual);
+            Image image = new Image();
+            image.Source = rtb;
+            Screen.Children.Add(image);
+        }
+        
+        private void DrawLine(Vector<double> v1, Vector<double> v2, DrawingContext draw) {
+            var pen = new Pen(Brush, 1);
+            draw.DrawLine(pen, new Point(v1[0], v1[1]), new Point(v2[0], v2[1]));
         }
 
         private void SetVerticalFov(object sender=null, SizeChangedEventArgs e=null)
