@@ -2,17 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace _3D_graphics.Objects
 {
-    class Camera : Abstract3DObject
-    {
-        public Canvas screen;
+    internal interface ICamera : I3DObject {
+        Canvas Screen { get; }
+        double XFov { get; set; }
+        double YFov { get; }
+        double CutoffNearPlane { get; set; }
+        void ClearScreen();
+        void DrawScene(IEnumerable<IWireframe> scene);
+    }
+
+    class Camera : Abstract3DObject, ICamera {
+        public Canvas Screen { get; }
 
         double xFov;
         public double XFov { get => xFov; set { xFov = value; SetVerticalFov(); } }
@@ -20,34 +26,34 @@ namespace _3D_graphics.Objects
 
         public double CutoffNearPlane { get; set; } = 0.1d;
 
-        private System.Windows.Media.Brush brush;
+        public System.Windows.Media.Brush Brush { get; set; }
 
         public Camera(
             Canvas screen,
             System.Windows.Media.Brush brush,
-            double Fov = Math.PI/2,
+            double fov = Math.PI/2,
             Vector<double> position = null, 
             Vector<double> rotation = null, 
             Vector<double> scale = null
             ) : base(position, rotation, scale)
             
         {
-            this.screen = screen;
-            this.XFov = Fov;
-            this.screen.SizeChanged += SetVerticalFov;
-            this.brush = brush;
+            this.Screen = screen;
+            this.XFov = fov;
+            this.Screen.SizeChanged += SetVerticalFov;
+            this.Brush = brush;
         }
 
         public void ClearScreen() {
-            screen.Children.Clear();
+            Screen.Children.Clear();
 
         }
 
         public void DrawScene(IEnumerable<IWireframe> scene)
         {
-            var projectionMatrix = getProjectionMatrix();
+            var projectionMatrix = GetProjectionMatrix();
             var inverseTransformMatrix = GetInverseMatrix();
-            var cameraToScreenMatrix = getCameraToScreenMatrix();
+            var cameraToScreenMatrix = GetCameraToScreenMatrix();
 
             var lines = scene.ToList()
                 .SelectMany(o => o.GetLines())
@@ -95,26 +101,22 @@ namespace _3D_graphics.Objects
                 return (line.Item1, intersection);
         }
 
-        private Matrix<double> getProjectionMatrix()
-        {
-            return Matrix<double>.Build.DenseOfArray(new double[,]
+        private Matrix<double> GetProjectionMatrix() =>
+            Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {1 / Math.Tan(XFov/2), 0, 0, 0},
                 {0, 1 / Math.Tan(YFov/2), 0, 0 },
                 {0, 0, 1, 0 },
                 {0, 0, 0, 1 }
             });
-        }
 
-        private Matrix<double> getCameraToScreenMatrix()
-        {
-            return Matrix<double>.Build.DenseOfArray(new double[,]{
-                {screen.ActualWidth/2, 0, screen.ActualWidth/2, 0},
-                {0, -screen.ActualHeight/2 , screen.ActualHeight/2, 0},
+        private Matrix<double> GetCameraToScreenMatrix() =>
+            Matrix<double>.Build.DenseOfArray(new[,]{
+                {Screen.ActualWidth/2, 0, Screen.ActualWidth/2, 0},
+                {0, -Screen.ActualHeight/2 , Screen.ActualHeight/2, 0},
                 {0, 0, 1, 0 },
                 {0, 0, 0, 1 }
             });
-        }
 
         private Vector<double> WorldToCamera(Vector<double> wsv, Matrix<double> projectionMatrix)
         {
@@ -124,21 +126,22 @@ namespace _3D_graphics.Objects
 
         private void DrawLine(Vector<double> v1, Vector<double> v2)
         {
-            Line line = new Line();
-            line.Stroke = brush;
-
-            line.X1 = v1[0];
-            line.X2 = v2[0];
-            line.Y1 = v1[1];
-            line.Y2 = v2[1];
-
-            line.StrokeThickness = 1;
-            screen.Children.Add(line);
+            var line = new Line
+            {
+                Stroke = Brush,
+                X1 = v1[0],
+                X2 = v2[0],
+                Y1 = v1[1],
+                Y2 = v2[1],
+                StrokeThickness = 1
+            };
+            
+            Screen.Children.Add(line);
         }
 
         private void SetVerticalFov(object sender=null, SizeChangedEventArgs e=null)
         {
-            YFov = Math.Atan(Math.Tan(XFov / 2) * screen.ActualHeight / screen.ActualWidth) * 2;
+            YFov = Math.Atan(Math.Tan(XFov / 2) * Screen.ActualHeight / Screen.ActualWidth) * 2;
         }
     }
 }

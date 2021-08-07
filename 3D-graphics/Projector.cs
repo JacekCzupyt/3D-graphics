@@ -32,7 +32,6 @@ namespace _3D_graphics
             )
         };
 
-        Camera MainCamera;
-        Camera SecondaryCamera;
+        ICamera MainCamera;
     }
 }

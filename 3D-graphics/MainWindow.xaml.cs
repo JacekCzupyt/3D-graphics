@@ -33,12 +33,16 @@ namespace _3D_graphics
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            MainCamera = new Camera(MainDisplayCanvas, System.Windows.Media.Brushes.Red);
 
             var converter = new System.Windows.Media.BrushConverter();
-            var brush = (Brush)converter.ConvertFromString("#00f7ff");
-
-            SecondaryCamera = new Camera(MainDisplayCanvas, brush);
+            var blueBrush = (Brush)converter.ConvertFromString("#00f7ff");
+            
+            MainCamera = new Camera3D(
+                MainDisplayCanvas,
+                Brushes.Red,
+                blueBrush
+            );
+            
             InitializeTimer();
         }
 
@@ -65,7 +69,6 @@ namespace _3D_graphics
             Scene.ForEach(o => o.Rotation[1] += dt * Math.PI / 2);
             MainCamera.ClearScreen();
             MainCamera.DrawScene(Scene);
-            SecondaryCamera.DrawScene(Scene);
         }
     }
 }
