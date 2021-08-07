@@ -33,7 +33,6 @@ namespace _3D_graphics
 
         private void MainDisplayCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-
             var converter = new System.Windows.Media.BrushConverter();
             var blueBrush = (Brush)converter.ConvertFromString("#00f7ff");
             
@@ -68,7 +67,20 @@ namespace _3D_graphics
         {
             Scene.ForEach(o => o.Rotation[1] += dt * Math.PI / 2);
             MainCamera.ClearScreen();
-            MainCamera.DrawScene(Scene);
+
+            var geo = MainCamera.DrawScene(Scene);
+            var rc = new Rectangle {
+                Fill = new DrawingBrush(geo),
+                Height = geo.Bounds.Height,
+                Width = geo.Bounds.Width
+            };
+            Canvas.SetTop(rc, geo.Bounds.Top);
+            Canvas.SetLeft(rc, geo.Bounds.Left);
+            MainDisplayCanvas.Children.Add(rc);
+        }
+        private void MainImageContainer_Loaded(object sender, RoutedEventArgs e) {
+            
+            
         }
     }
 }

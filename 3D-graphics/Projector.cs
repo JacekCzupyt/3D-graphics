@@ -20,15 +20,15 @@ namespace _3D_graphics
             ),
             new Cylinder(
                 position:Vector<double>.Build.DenseOfArray(new double[] { 3, 0, 0, 1 }),
-                density:10
+                density:40
             ),
             new Cone(
                 position:Vector<double>.Build.DenseOfArray(new double[] { -3, 0, 0, 1 }),
-                density:10
+                density:40
             ),
             new Sphere(
                 position:Vector<double>.Build.DenseOfArray(new double[] { 0, 0, -3, 1 }),
-                density:60
+                density:200
             )
         };
 

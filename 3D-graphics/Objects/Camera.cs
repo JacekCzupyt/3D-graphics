@@ -16,7 +16,7 @@ namespace _3D_graphics.Objects
         double YFov { get; }
         double CutoffNearPlane { get; set; }
         void ClearScreen();
-        void DrawScene(IEnumerable<IWireframe> scene);
+        Drawing DrawScene(IEnumerable<IWireframe> scene);
     }
 
     class Camera : Abstract3DObject, ICamera {
@@ -99,49 +99,41 @@ namespace _3D_graphics.Objects
             return v / v[2];
         }
 
-        public void DrawScene(IEnumerable<IWireframe> scene)
-        {
-            Rect rect = new Rect();
-            rect.Width = Screen.ActualWidth;
-            rect.Height = Screen.ActualHeight;
-            DrawingVisual drawingVisual = new DrawingVisual();
-            using (var draw = drawingVisual.RenderOpen())
+        public Drawing DrawScene(IEnumerable<IWireframe> scene) {
+            var lineGroup = new GeometryGroup();
+
+            var projectionMatrix = GetProjectionMatrix();
+            var inverseTransformMatrix = GetInverseMatrix();
+            var cameraToScreenMatrix = GetCameraToScreenMatrix();
+
+            var lines = scene.ToList()
+                .SelectMany(o => o.GetLines())
+                .Select(l => (inverseTransformMatrix * l.Item1, inverseTransformMatrix * l.Item2));
+
+            foreach(var line in lines)
             {
-                var projectionMatrix = GetProjectionMatrix();
-                var inverseTransformMatrix = GetInverseMatrix();
-                var cameraToScreenMatrix = GetCameraToScreenMatrix();
+                var cutLine = Cutoff(line, CutoffNearPlane);
+                if (cutLine == null)
+                    continue;
 
-                var lines = scene.ToList()
-                    .SelectMany(o => o.GetLines())
-                    .Select(l => (inverseTransformMatrix * l.Item1, inverseTransformMatrix * l.Item2));
+                var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
+                var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
 
-                foreach(var line in lines)
-                {
-                    var cutLine = Cutoff(line, CutoffNearPlane);
-                    if (cutLine == null)
-                        continue;
+                if (OutOfBounds((cp1, cp2)))
+                    continue;
 
-                    var cp1 = WorldToCamera(cutLine.Value.Item1, projectionMatrix);
-                    var cp2 = WorldToCamera(cutLine.Value.Item2, projectionMatrix);
-
-                    if (OutOfBounds((cp1, cp2)))
-                        continue;
-
-                    var p1 = cameraToScreenMatrix * cp1;
-                    var p2 = cameraToScreenMatrix * cp2;
-                    DrawLine(p1, p2, draw);
-                }
+                var p1 = cameraToScreenMatrix * cp1;
+                var p2 = cameraToScreenMatrix * cp2;
+                DrawLine(p1, p2, lineGroup);
             }
-            RenderTargetBitmap rtb = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
-            rtb.Render(drawingVisual);
-            Image image = new Image();
-            image.Source = rtb;
-            Screen.Children.Add(image);
+
+            var geoDrawing = new GeometryDrawing(Brush, new Pen(Brush, 1), lineGroup);
+            geoDrawing.Freeze();
+            return geoDrawing;
         }
         
-        private void DrawLine(Vector<double> v1, Vector<double> v2, DrawingContext draw) {
-            var pen = new Pen(Brush, 1);
-            draw.DrawLine(pen, new Point(v1[0], v1[1]), new Point(v2[0], v2[1]));
+        private void DrawLine(Vector<double> v1, Vector<double> v2, GeometryGroup geo) {
+            geo.Children.Add(new LineGeometry(new Point(v1[0], v1[1]), new Point(v2[0], v2[1])));
         }
 
         private void SetVerticalFov(object sender=null, SizeChangedEventArgs e=null)

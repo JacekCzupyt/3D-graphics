@@ -12,7 +12,7 @@
         </Menu>
         <Grid>
             <Canvas x:Name="MainDisplayCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                   Loaded="MainDisplayCanvas_Loaded"/>
+                    Loaded="MainDisplayCanvas_Loaded"/>
         </Grid>
     </DockPanel>
 </Window>

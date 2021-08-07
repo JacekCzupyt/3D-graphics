@@ -49,11 +49,14 @@ namespace _3D_graphics.Objects {
             Screen.Children.Clear();
         }
         
-        public void DrawScene(IEnumerable<IWireframe> scene) {
+        public Drawing DrawScene(IEnumerable<IWireframe> scene) {
             SetCameraTransforms();
             var wireframes = scene.ToList();
-            LeftCamera.DrawScene(wireframes);
-            RightCamera.DrawScene(wireframes);
+            DrawingGroup drawingGroup = new DrawingGroup();
+            drawingGroup.Children.Add(LeftCamera.DrawScene(wireframes));
+            drawingGroup.Children.Add(RightCamera.DrawScene(wireframes));
+            drawingGroup.Freeze();
+            return drawingGroup;
         }
         
         private void SetCameraTransforms() {
